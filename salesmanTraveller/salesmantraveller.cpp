@@ -1,17 +1,19 @@
 #include "salesmantraveller.h"
 
+
 SalesmanTraveller::SalesmanTraveller(int** arr, int size, std::vector<Edge> *&ways) : sizeArr{ size + 1 }, sizeArrSecond{ size + 1 }, firstSizeArr{ size + 1 }, Ways{ ways }
 {
-    arr = new int*[sizeArr];
-    arraySecond = new int*[sizeArrSecond];
 
+    array = new int*[sizeArr];
+    arraySecond = new int*[sizeArrSecond];
     for (int i = 0; i < sizeArr; i++)
     {
         array[i] = new int[sizeArr];
         arraySecond[i] = new int[sizeArr];
     }
 
-    for (int i  = 0; i < sizeArr; i++)
+
+    for (int i = 0; i < sizeArr; i++)
     {
         for (int j = 0; j < sizeArr; j++)
         {
@@ -23,41 +25,40 @@ SalesmanTraveller::SalesmanTraveller(int** arr, int size, std::vector<Edge> *&wa
             if (j == 0)
             {
                 array[i][j] = i - 1;
-                arraySecond[i][j] =  i - 1;
+                arraySecond[i][j] = i - 1;
             }
             if (i > 0 && j > 0)
             {
-                array[i][j] = i - 1;
+                array[i][j] = arr[i - 1][j - 1];
                 arraySecond[i][j] = arr[i - 1][j - 1];
             }
         }
     }
+
     di = new int[sizeArr - 1];
     dj = new int[sizeArr - 1];
     diSecond = new int[sizeArr - 1];
     djSecond = new int[sizeArr - 1];
 
-    for (int i = 0; 9  < sizeArr - 1; i++)
+    for (int i = 0; i < sizeArr - 1; i++)
     {
-        di[i] = 100000;
-        dj[i] = 100000;
-        diSecond[i] = 100000;
-        djSecond[i] = 100000;
+        di[i] = dj[i] = diSecond[i] = djSecond[i] = 101;
     }
 
+
     HWays = 0;
-    H_current = 0;
-    H_0 = 0;
-    H_1 = 0;
+
+    H_current = 0, H_0 = 0, H_1 = 0;
 }
 
 int SalesmanTraveller::findMinElemColumn(int j, int currI)
 {
-    int min = 100000;
+    int min = 101;
     for (int i = 1; i < sizeArr; i++)
     {
         if (array[i][j] != -1)
         {
+
             if (currI == -1)
             {
                 if (array[i][j] < min)
@@ -77,26 +78,20 @@ int SalesmanTraveller::findMinElemColumn(int j, int currI)
             }
         }
     }
-    if (currI == -1)
-    {
-        if (min == 100000)
-            min = 0;
-    }
-    else
-    {
-        if (min == 100000)
-            min = 100000;
-    }
+    if (currI == -1) { if (min == 101) min = 0; }
+    else { if (min == 101) min = 101; }
+
     return min;
 }
 
 int SalesmanTraveller::findMinElemRow(int i, int currJ)
 {
-    int min = 100000;
+    int min = 101;
     for (int j = 1; j < sizeArr; j++)
     {
         if (array[i][j] != -1)
         {
+
             if (currJ == -1)
             {
                 if (array[i][j] < min)
@@ -116,36 +111,33 @@ int SalesmanTraveller::findMinElemRow(int i, int currJ)
             }
         }
     }
-    if (currJ == -1)
-    {
-        if (min == 100000)
-            min = 0;
-    }
-    else
-    {
-        if (min == 100000)
-            min = 100000;
-    }
+
+    if (currJ == -1) { if (min == 101) min = 0; }
+    else { if (min == 101) min = 101; }
+
     return min;
 }
 
 void SalesmanTraveller::findDi()
 {
-    for (int i = 1; i < sizeArr - 1; i++)
+
+    for (int i = 0; i < sizeArr - 1; i++)
     {
-        di[i] = 100000;
+        di[i] = 101;
     }
     di_sum = 0;
 
     for (int i = 0; i < sizeArr - 1; i++)
     {
-        di[i] = findMinElemRow(i+1);
+        di[i] = findMinElemRow(i + 1);
         di_sum += di[i];
     }
+
 }
 
 void SalesmanTraveller::findDj()
 {
+
     for (int j = 0; j < sizeArr - 1; j++)
     {
         dj[j] = 101;
@@ -203,6 +195,7 @@ void SalesmanTraveller::findZeros()
             }
         }
     }
+
 }
 
 void SalesmanTraveller::findZeros1()
@@ -221,7 +214,6 @@ void SalesmanTraveller::findZeros1()
             }
         }
 }
-
 
 int SalesmanTraveller::findBiggerZero()
 {
@@ -304,7 +296,6 @@ void SalesmanTraveller::edgesExclusion(int indexI, int indexJ)
 
 
     --sizeArr;
-
 
 
     for (int i = indexI; i < sizeArr; i++)
@@ -432,12 +423,7 @@ SalesmanTraveller::~SalesmanTraveller()
         delete[] dj;
         delete[] diSecond;
         delete[] djSecond;
-    }
-
-
-
-
-
+}
 
 
 

@@ -1,5 +1,7 @@
 #include "adjmatrix.h"
-
+#include <QStack>
+#include <queue>
+#include <stack>
 AdjMatrix::AdjMatrix(QObject *parent) : QObject(parent)
 {
     PathMatrix = nullptr;
@@ -241,8 +243,8 @@ void AdjMatrix::setPointColor(int firstVert, int chose)
         {
         case 0:
         {
-            Points[firstVert]->circle->setBrush(QColor(255,127,39));
-            Points[firstVert]->circle->setPen(QPen(QColor(255,127,39)));
+            Points[firstVert]->circle->setBrush(Qt::gray);
+            Points[firstVert]->circle->setPen(QPen(Qt::gray));
             break;
         }
         case 1:
@@ -320,7 +322,7 @@ void AdjMatrix::ActivateSalesmansMethod()
         }
 
 
-        std::vector<SalesmanTraveller::Edge> *Ways = new std::vector<SalesmanTraveller::Edge>;;
+        std::vector<SalesmanTraveller::Edge> *Ways = new std::vector<SalesmanTraveller::Edge>;
 
         SalesmanTraveller* Method = new SalesmanTraveller(arr, Points.size(), Ways);
 
@@ -328,10 +330,26 @@ void AdjMatrix::ActivateSalesmansMethod()
 
         delete Method;
 
+        QString res;
+        res += "Edges: ";
+
         for(int i = 0; i < (*Ways).size(); i++)
         {
             setLineColor((*Ways)[i].firstTop, (*Ways)[i].secondTop, 2);
+            res += "("+ QString::number((*Ways)[i].firstTop) + ":" + QString::number((*Ways)[i].secondTop)  + ")";
         }
+
+        res += " Cost: ";
+        int cost = 0;
+        for (int i = 0; i < (*Ways).size(); i++)
+        {
+            cost += PathMatrix[(*Ways)[i].firstTop][(*Ways)[i].secondTop].size;
+        }
+        res += QString::number(cost);
+
+
+        emit signalSendLabelTextChange(res);
+
 
         delete Ways;
 
@@ -342,30 +360,129 @@ void AdjMatrix::ActivateSalesmansMethod()
         delete[] arr;
     }
 }
-
-QString AdjMatrix::matrixOutput()
+ QVector<QPair<int, int>> AdjMatrix::getEdges(int index)
 {
-    QString res;
-
-    res += "     ";
-    for (int i  = 0; i < Points.size(); i++)
+    QVector<QPair<int, int >> res;
+    for (int j = 0; j < Points.size(); j++)
     {
-        res += QString::number(i)+"   ";
-    }
-    res += "\n";
-    for (int i = 0; i < Points.size(); i++)
-    {
-        res += QString::number(i)+" ";
-        for (int j = 0; j < Points.size(); j++)
-        {
-             res += QString::number(PathMatrix[i][j].size)+" ";
-
-        }
-        res += "\n";
+        if (PathMatrix[index][j].size > 0)
+            res.push_back(qMakePair(index, j));
     }
     return res;
 }
 
+QVector<int> AdjMatrix::dijkstra(int vertexIndex)
+{
+    int Adj_matrix[Points.size()][Points.size()];
+    for(int i=0;i<Points.size();i++)
+    {
+        for(int j=0;j<Points.size();j++)
+        {
+            if(i==j) Adj_matrix[i][j] = 0;
+            else Adj_matrix[i][j] = 1000000;
+        }
+    }
+
+    PriorityQueue<int> queue;
+
+    for(int i=0;i<Points.size();i++)
+    {
+        queue.enqueue(Adj_matrix[vertexIndex][i],i);
+    }
+
+    while(queue.count()>0)
+    {
+        int Curr_vertex = queue.dequeue();
+        auto edges = getEdges(vertexIndex);
+
+        for(int i=0;i<edges.size();i++)
+        {
+            int edge_data = PathMatrix[Curr_vertex][edges[i].second].size;
+            int dest = edges[i].second;
+
+            if(Adj_matrix[vertexIndex][Curr_vertex]+edge_data < Adj_matrix[vertexIndex][dest])
+            {
+                int old = Adj_matrix[vertexIndex][dest];
+
+                Adj_matrix[vertexIndex][dest] = Adj_matrix[vertexIndex][Curr_vertex]+edge_data;
+
+                queue.update(old,dest,Adj_matrix[vertexIndex][dest]);
+            }
+        }
+    }
+    QVector<int> new_vector;
+
+    for(int i=0;i<Points.size();i++)
+    {
+        new_vector.push_back(Adj_matrix[vertexIndex][i]);
+    }
+    return new_vector;
+}
+QVector<int> AdjMatrix::getNbrsVertex(int index)
+{
+    QVector<int> res;
+
+    for (int i = 0; i < Points.size(); i++)
+    {
+        if (PathMatrix[index][i].size > 0)
+        {
+            res.push_back(i);
+        }
+    }
+    return res;
+}
+QVector<int> AdjMatrix::DFS(int vertexIndex)
+{
+    QVector<int> res;
+    stack<int> stack;
+    stack.push(vertexIndex);
+    QVector<bool> visited = QVector<bool>(Points.size(), false);
+    visited[vertexIndex] = true;
+
+
+    while (!stack.empty())
+    {
+        auto frontVertex = stack.top();
+        stack.pop();
+        res.push_back(frontVertex);
+        for (auto nbr : getNbrsVertex(frontVertex))
+        {
+            if (visited[nbr] != true)
+            {
+                stack.push(nbr);
+                visited[nbr] = true;
+
+            }
+        }
+    }
+    return res;
+}
+QVector<int> AdjMatrix::BFS(int vertexIndex)
+{
+    QVector<int> res;
+    queue<int> queue;
+    queue.push(vertexIndex);
+    QVector<bool> visited = QVector<bool>(Points.size(), false);
+    visited[vertexIndex] = true;
+
+
+    while (!queue.empty())
+    {
+        int frontVertex = queue.front();
+        queue.pop();
+        res.push_back(frontVertex);
+        for (auto nbr : getNbrsVertex(frontVertex))
+        {
+            if (visited[nbr] != true)
+            {
+                queue.push(nbr);
+                visited[nbr] = true;
+
+            }
+        }
+    }
+    return res;
+}
 AdjMatrix::~AdjMatrix()
 {
 

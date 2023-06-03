@@ -20,6 +20,7 @@ HEADERS += \
     adjmatrix.h \
     mainwindow.h \
     paintscene.h \
+    priorityQueue.h \
     salesmantraveller.h \
     vertex.h
 

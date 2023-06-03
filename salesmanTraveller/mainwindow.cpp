@@ -18,7 +18,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(Matrix, &AdjMatrix::signalSendMatrixSize, this, &MainWindow::slotGetMatrixSize);
 
-    this->setFixedSize(1024,600);
+    connect(Matrix, &AdjMatrix::signalSendLabelTextChange, this, &MainWindow::updateLabelText);
+
+    this->setFixedSize(1024,700);
 }
 
 void MainWindow::sendPtrMatrix(AdjMatrix*& out_ptrMatrix)
@@ -44,13 +46,24 @@ void MainWindow::slotGetMatrixSize(int size)
     ui->comboBox->clear();
     ui->comboBox_2->clear();
     ui->comboBox_3->clear();
+    ui->comboBox_4->clear();
+    ui->comboBox_5->clear();
+    ui->comboBox_6->clear();
+    ui->comboBox_7->clear();
+    ui->comboBox_8->clear();
+    ui->label_4->clear();
+    ui->label_8->clear();
+    ui->label_9->clear();
     if(size!=-1)
     {
         for(int i = 0; i < size; i++)
         {
             ui->comboBox->addItem(QString::number(i));
             ui->comboBox_2->addItem(QString::number(i));
-            ui->comboBox_3->addItem(QString::number(i));
+            ui->comboBox_4->addItem(QString::number(i));
+            ui->comboBox_6->addItem(QString::number(i));
+            ui->comboBox_7->addItem(QString::number(i));
+            ui->comboBox_8->addItem(QString::number(i));
         }
     }
     adjMatrix = ui->tableWidget;
@@ -113,6 +126,11 @@ void MainWindow::updateComboBox_3(int indexOfComboBox_2)
     }
 }
 
+void MainWindow::on_comboBox_4_currentIndexChanged(int index)
+{
+    updateComboBox_5(index);
+}
+
 void MainWindow::updateComboBox_5(int indexOfcomboBox_4)
 {
     if (indexOfcomboBox_4 >= 0)
@@ -164,9 +182,63 @@ void MainWindow::on_comboBox_currentIndexChanged(int index)
 {
     if(index >=0)
     {
-        ui->label_4->clear();
-        ui->label_4->setText(QString::number(Matrix->degreeOfTop(index)));
         Matrix->setAllPointsOneColor(0);
         Matrix->setPointColor(index, 1);
     }
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    int i = ui->comboBox_4->currentIndex();
+    int j = ui->comboBox_5->currentText().toInt();
+
+    if(i!=j)
+    {
+        if(ui->lineEdit_2->text().toInt() > 0 && ui->lineEdit_2->text().toInt() <= 100 && i >= 0 && j >= 0)
+        {
+            Matrix->addLine(i, j, ui->lineEdit_2->text().toInt());
+            scene->addItem_Line(i, j);
+        }
+    }
+}
+void MainWindow::on_pushButton_6_clicked()
+{
+    int index = ui->comboBox_6->currentText().toInt();
+    QVector<int> vec = Matrix->dijkstra(index);
+    QString res = "";
+    for (int i = 0; i < vec.size(); i++)
+    {
+        res += QString::number(vec[i]) + " ";
+    }
+    ui->label_7->setText(res);
+}
+void MainWindow::on_pushButton_7_clicked()
+{
+    int index = ui->comboBox_7->currentText().toInt();
+    QVector<int> res = Matrix->DFS(index);
+    QString text = "";
+    text += QString::number(res[0]);
+    for (int i = 1; i < res.size(); i++)
+    {
+        text += "->" + QString::number(res[i]);
+
+    }
+    ui->label_8->setText(text);
+}
+void MainWindow::on_pushButton_8_clicked()
+{
+    int index = ui->comboBox_8->currentText().toInt();
+    QVector<int> res = Matrix->BFS(index);
+    QString text = "";
+    text += QString::number(res[0]);
+    for (int i = 1; i < res.size(); i++)
+    {
+        text += "->" + QString::number(res[i]);
+
+    }
+    ui->label_9->setText(text);
+}
+void MainWindow::updateLabelText(const QString& argl)
+{
+    ui->label_4->setText(argl);
 }

@@ -3,6 +3,7 @@
 
 #include "vertex.h"
 #include "salesmantraveller.h"
+#include "priorityQueue.h"
 
 #include <vector>
 #include <QObject>
@@ -10,6 +11,11 @@
 #include <ctime>
 #include <random>
 #include <QString>
+#include <QVector>
+#include <QQueue>
+#include <QPair>
+
+using namespace std;
 
 struct Path
 {
@@ -36,7 +42,7 @@ signals:
     void signalDeleteItem_Vertex(int index);
 
     void signalSendMatrixSize(int size);
-
+    void signalSendLabelTextChange(const QString& argl);
 
 public:
 
@@ -50,7 +56,12 @@ public:
     void setPointColor(int firstVert, int chose);
     void setAllPointsOneColor(int chose);
 
-    QString matrixOutput();
+    QVector<int> getNbrsVertex(int index);
+    QVector<QPair<int, int>> getEdges(int index);
+    QVector<int> DFS(int vertexIndex);
+    QVector<int> BFS(int vertexIndex);
+
+    QVector<int> dijkstra(int vertexIndex);
 
     void setPathSize(int firstVert, int secondVert, int size);
 
