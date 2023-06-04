@@ -301,7 +301,7 @@ int AdjMatrix::degreeOfTop(int numbOfTop)
     return count;
 }
 
-void AdjMatrix::ActivateSalesmansMethod()
+void AdjMatrix::ActivateSalesmansMethod(int vertexIndex)
 {
     if(Points.size() > 2)
     {
@@ -330,13 +330,80 @@ void AdjMatrix::ActivateSalesmansMethod()
 
         delete Method;
 
-        QString res;
-        res += "Edges: ";
 
-        for(int i = 0; i < (*Ways).size(); i++)
+        std::vector<SalesmanTraveller::Edge> Ways_copy;
+
+        for (int i = 0; i < Ways->size(); i++)
         {
-            setLineColor((*Ways)[i].firstTop, (*Ways)[i].secondTop, 2);
-            res += "("+ QString::number((*Ways)[i].firstTop) + ":" + QString::number((*Ways)[i].secondTop)  + ")";
+            Ways_copy.push_back((*Ways)[i]);
+        }
+
+        QPair<int, int> start;
+
+        for (int i = 0; i < Ways_copy.size(); i++)
+        {
+            if (Ways_copy[i].firstTop == vertexIndex)
+            {
+                start = qMakePair(vertexIndex, Ways_copy[i].secondTop);
+
+                auto it = remove_if(Ways_copy.begin(), Ways_copy.end(), [&](SalesmanTraveller::Edge e){return e == Ways_copy[i];});
+                Ways_copy.erase(it, Ways_copy.end());
+                break;
+            }
+            else if (Ways_copy[i].secondTop == vertexIndex)
+            {
+                start = qMakePair(vertexIndex, Ways_copy[i].firstTop);
+
+                auto it = remove_if(Ways_copy.begin(), Ways_copy.end(), [&](SalesmanTraveller::Edge e){return e == Ways_copy[i];});
+                Ways_copy.erase(it, Ways_copy.end());
+                break;
+            }
+        }
+
+
+
+        QVector<int> vertexVec;
+        vertexVec.push_back(start.first);
+        int index;
+        QPair<int, int> curr(start.first, start.second);
+
+        while (!Ways_copy.empty())
+        {
+                index = curr.second;
+
+            for (int i = 0; i < Ways_copy.size(); i++)
+            {
+                if (Ways_copy[i].firstTop == index)
+                {
+                    curr = qMakePair(index, Ways_copy[i].secondTop);
+
+                    auto it = remove_if(Ways_copy.begin(), Ways_copy.end(), [&](SalesmanTraveller::Edge e){return e == Ways_copy[i];});
+                    Ways_copy.erase(it, Ways_copy.end());
+                    break;
+                }
+                else if (Ways_copy[i].secondTop == index)
+                {
+                    curr = qMakePair(index, Ways_copy[i].firstTop);
+
+                    auto it = remove_if(Ways_copy.begin(), Ways_copy.end(), [&](SalesmanTraveller::Edge e){return e == Ways_copy[i];});
+                    Ways_copy.erase(it, Ways_copy.end());
+                    break;
+                }
+            }
+            vertexVec.push_back(curr.first);
+            if (Ways_copy.empty())
+            {
+                vertexVec.push_back(curr.second);
+            }
+        }
+
+        QString res;
+        res += "Result: ";
+        res += QString::number(vertexVec[0]);
+
+        for (int i = 1; i < vertexVec.size(); i++)
+        {
+            res+= "->" + QString::number(vertexVec[i]);
         }
 
         res += " Cost: ";
@@ -345,11 +412,15 @@ void AdjMatrix::ActivateSalesmansMethod()
         {
             cost += PathMatrix[(*Ways)[i].firstTop][(*Ways)[i].secondTop].size;
         }
-        res += QString::number(cost);
 
+        res += QString::number(cost);
 
         emit signalSendLabelTextChange(res);
 
+        for(int i = 0; i < Ways->size(); i++)
+        {
+            setLineColor((*Ways)[i].firstTop, (*Ways)[i].secondTop, 2);
+        }
 
         delete Ways;
 
@@ -393,7 +464,7 @@ QVector<int> AdjMatrix::dijkstra(int vertexIndex)
     while(queue.count()>0)
     {
         int Curr_vertex = queue.dequeue();
-        auto edges = getEdges(vertexIndex);
+        auto edges = getEdges(Curr_vertex);
 
         for(int i=0;i<edges.size();i++)
         {
@@ -418,6 +489,7 @@ QVector<int> AdjMatrix::dijkstra(int vertexIndex)
     }
     return new_vector;
 }
+
 QVector<int> AdjMatrix::getNbrsVertex(int index)
 {
     QVector<int> res;

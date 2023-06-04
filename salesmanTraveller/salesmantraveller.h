@@ -16,6 +16,10 @@ public:
         {
 
         }
+        bool operator==(Edge e)
+        {
+            return e.firstTop ==  firstTop && e.secondTop == secondTop;
+        }
     };
 
 private:

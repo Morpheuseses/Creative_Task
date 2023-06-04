@@ -68,7 +68,7 @@ public:
     void setAllLinesOneColor(int chose);
     int degreeOfTop(int numbOfTop);
 
-    void ActivateSalesmansMethod();
+    void ActivateSalesmansMethod(int vertexIndex);
 };
 
 #endif // MATRIX_H

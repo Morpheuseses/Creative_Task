@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(Matrix, &AdjMatrix::signalSendLabelTextChange, this, &MainWindow::updateLabelText);
 
-    this->setFixedSize(1024,700);
+    this->setFixedSize(1024,750);
 }
 
 void MainWindow::sendPtrMatrix(AdjMatrix*& out_ptrMatrix)
@@ -54,6 +54,7 @@ void MainWindow::slotGetMatrixSize(int size)
     ui->label_4->clear();
     ui->label_8->clear();
     ui->label_9->clear();
+    ui->tableWidget_2->clear();
     if(size!=-1)
     {
         for(int i = 0; i < size; i++)
@@ -91,7 +92,7 @@ void MainWindow::slotGetMatrixSize(int size)
 
 void MainWindow::on_pushButton_5_clicked()
 {
-    Matrix->ActivateSalesmansMethod();
+    Matrix->ActivateSalesmansMethod(ui->comboBox->currentText().toInt());
 }
 
 void MainWindow::on_pushButton_2_clicked()
@@ -205,12 +206,32 @@ void MainWindow::on_pushButton_6_clicked()
 {
     int index = ui->comboBox_6->currentText().toInt();
     QVector<int> vec = Matrix->dijkstra(index);
-    QString res = "";
+    QTableWidget* tbl = ui->tableWidget_2;
+
+    tbl->setColumnCount(vec.size());
+    tbl->setRowCount(1);
+
+    QStringList header;
+
     for (int i = 0; i < vec.size(); i++)
     {
-        res += QString::number(vec[i]) + " ";
+        header << QString::number(i);
     }
-    ui->label_7->setText(res);
+
+    tbl->setHorizontalHeaderLabels(header);
+
+    header.clear();
+    header.append("distance");
+
+    tbl->setVerticalHeaderLabels(header);
+
+    for (int i = 0; i < tbl->rowCount(); i++)
+        for (int j = 0; j < tbl->columnCount(); j++)
+        {
+            QTableWidgetItem * tblItem = new QTableWidgetItem(QString::number(vec[j]));
+            tbl->setItem(i,j,tblItem);
+        }
+
 }
 void MainWindow::on_pushButton_7_clicked()
 {
