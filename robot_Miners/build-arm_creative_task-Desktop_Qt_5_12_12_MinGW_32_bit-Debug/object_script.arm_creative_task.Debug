@@ -1,0 +1,11 @@
+debug/main.o
+debug/mainwindow.o
+debug/map.o
+debug/myglwidget.o
+debug/mypainter.o
+debug/node.o
+debug/qlistmodel.o
+debug/robot.o
+debug/moc_mainwindow.o
+debug/moc_myglwidget.o
+debug/moc_qlistmodel.o

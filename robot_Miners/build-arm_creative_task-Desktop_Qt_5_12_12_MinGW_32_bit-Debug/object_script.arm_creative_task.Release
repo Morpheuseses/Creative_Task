@@ -1,0 +1,11 @@
+release/main.o
+release/mainwindow.o
+release/map.o
+release/myglwidget.o
+release/mypainter.o
+release/node.o
+release/qlistmodel.o
+release/robot.o
+release/moc_mainwindow.o
+release/moc_myglwidget.o
+release/moc_qlistmodel.o
