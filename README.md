@@ -1,2 +1,4 @@
 # Creative_Task
-Salesman traveller and workstation
+## Задача коммивояжера и АРМ
+
+тема АРМ : АРМ оператора роботов шахтеров
