@@ -350,6 +350,7 @@ void SalesmanTraveller::chooseMatrix(int chose)
 
 void SalesmanTraveller::mainFunction()
 {
+    // reduction of Matrix
     reduceMatrix();
 
     H_current = di_sum + dj_sum;
@@ -361,7 +362,7 @@ void SalesmanTraveller::mainFunction()
     {
         if (isH_0 == false)
         {
-
+            // find zero weight
             findZeros();
         }
         else
@@ -369,24 +370,25 @@ void SalesmanTraveller::mainFunction()
             zerosArray.erase(zerosArray.begin() + numbOfZeroMax);
 
         }
-
+        //find zero with max weight
         numbOfZeroMax = findBiggerZero();
         Zero zeroMax = zerosArray[numbOfZeroMax];
 
-
+        // path length without edge
         H_0 = H_current + zeroMax.quantity;
 
         edgesExclusion(zeroMax.i, zeroMax.j);
         exclusionSimilarEdge(zeroMax.i, zeroMax.j, 1);
 
-
+        // reduction of Matrix
         reduceMatrix();
-
+        // path length with edge
         H_1 = H_current + di_sum + dj_sum;
 
         if (H_1 <= H_0)
         {
             isH_0 = false;
+            // add Edge to array of Edges
             (*Ways).push_back(Edge(arraySecond[zeroMax.i][0], arraySecond[0][zeroMax.j]));
             chooseMatrix(1);
 
